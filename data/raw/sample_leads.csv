@@ -1,0 +1,8 @@
+
+
+Prospect_Name,Mobile_Number,Target_Zone,Requirement,Source_Channel
+Sample Person One,9876543210,Hadapsar,2BHK,synthetic-test-data
+Sample Person Two,8765432109,Fursungi,1BHK,synthetic-test-data
+Sample Person Three,7654321098,Adjacent_East_Pune,3BHK,synthetic-test-data
+Duplicate Test Person,9876543210,Hadapsar,2BHK,synthetic-test-data
+Invalid Test Person,12345,Unknown,4BHK,synthetic-test-data
