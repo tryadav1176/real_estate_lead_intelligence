@@ -33,21 +33,29 @@ A Python-based data engineering project designed to collect, validate, normalize
 ```text
 real_estate_lead_intelligence/
 ├── data/
-│   ├── raw/
-│   └── processed/
+│   ├── raw/sample_leads.csv       # synthetic test records only
+│   └── processed/                 # generated outputs; not committed
 ├── src/
-│   ├── scraper.py
-│   ├── cleaner.py
-│   ├── scorer.py
-│   └── database.py
+│   ├── scraper.py                 # reserved for an authorized extraction PoC
+│   ├── source_audit.py            # conservative robots/source review utility
+│   ├── cleaner.py                 # normalization and validation
+│   ├── scorer.py                  # provisional explainable score
+│   ├── database.py                # SQLite persistence and insert metrics
+│   └── pipeline.py                # CSV-to-cleaned-output workflow
 ├── tests/
-│   └── test_cleaner.py
-├── reports/
-│   └── day1.md
+│   ├── test_cleaner.py
+│   ├── test_scorer.py
+│   └── test_source_audit.py
 ├── docs/
-│   └── scope_architecture.md
+│   ├── scope_architecture.md
+│   └── source_audit.md
+├── evidence/                      # retained source-review evidence
+├── reports/
+│   ├── day1.md
+│   ├── day2.md
+│   └── robots_checks.csv
+├── robots_check.py
 ├── requirements.txt
-├── .gitignore
 └── README.md
 ```
 
@@ -111,9 +119,9 @@ python -m playwright install chromium
 
 ## Current Project Status
 
-**Initial setup and architecture planning.**
+**Prototype status: source-audit tooling and synthetic-data pipeline are implemented.**
 
-No company dataset or approved target source had been supplied at the time of writing. Initial tests will use clearly labelled synthetic data until an authorized source is confirmed.
+The current evidence records HTTP 403 responses for automated robots.txt requests to 99acres and MahaRERA. No source is confirmed as authorized for live prospect extraction, and no real prospect records are claimed. The scraper module remains intentionally inactive until the source, permitted fields, and terms are verified. The lead-scoring sub-rules are provisional.
 
 Implementation status will be updated as components are completed and tested.
 
