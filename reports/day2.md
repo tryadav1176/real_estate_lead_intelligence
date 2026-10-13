@@ -3,9 +3,9 @@
 **Project:** Amar Realty Lead Intelligence  
 **Candidate:** Tejas Yadav  
 **Date:** 13 October 2026  
-**Evaluation day:** 2 of 7  
+**Evaluation day:** Day 2 
 **Repository:** https://github.com/tryadav1176/real_estate_lead_intelligence  
-**Repository reference in the prior working history:** `93daa50` before these review corrections. The revised files must be committed in your local repository; use `git rev-parse --short HEAD` after committing to report the new current hash.
+**Git Commit Hash:** 81d4c9e
 
 ## 1. Objective
 

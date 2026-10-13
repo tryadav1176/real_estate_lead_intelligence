@@ -4,6 +4,7 @@
 **Target Role:** Lead Intelligence & Data Engineer  
 **Evaluation Day:** Day 1  
 **Date:** 12/10/2026  
+**Repository:** https://github.com/tryadav1176/real_estate_lead_intelligence 
 **Git Commit Hash:** 8cb9da5
 
 ## 1. Daily Engineering Tasks Completed
