@@ -1,80 +1,73 @@
-# Day 2 Daily Progress Report — Web Scraping and Source Discovery
+# CANDIDATE DAILY PROGRESS REPORT (DPR)
 
-**Project:** Amar Realty Lead Intelligence  
-**Candidate:** Tejas Yadav  
-**Date:** 13 October 2026  
-**Evaluation Day:** 2 of 7  
-**Repository:** https://github.com/tryadav1176/real_estate_lead_intelligence  
-**Git reference at report preparation:** `93daa50`
+**Candidate Name:** Tejas Rajendra Yadav  
+**Target Role:** Lead Intelligence & Data Engineer  
+**Evaluation Day:** Day 2  
+**Date:** 13/10/2026  
+**Git Commit Hash:** [PASTE OUTPUT OF `git rev-parse --short HEAD`]  
+**Repository:** https://github.com/tryadav1176/real_estate_lead_intelligence
 
-## 1. Objective
+## 1. Daily Engineering Tasks Completed
 
-Develop source-review tooling for the real-estate lead intelligence pipeline and investigate candidate sources for the Hadapsar and Fursungi micro-markets while maintaining responsible access and data-handling practices.
+- Built `src/source_audit.py` and `tests/test_source_audit.py` (mocked HTTP) for URL validation, robots.txt review and conservative authorization decisions.
+- Built `robots_check.py`, a standalone checker that tests specific URLs against a site's robots.txt, saves a dated copy of the file as evidence, reports Crawl-delay, and logs results to `reports/robots_checks.csv`.
+- Ran the checker against candidate sources (see Section 3) and reviewed 99acres robots.txt manually in a browser after the automated request was blocked.
+- Updated `.gitignore` so real extracted data under `data/raw/` cannot be committed (only the synthetic sample is tracked).
+- Sent a technical query with proof of concept to tech@amarrealty.co.in on [DATE/TIME IST] asking which source is authorized for prospect data.
+- Existing cleaning, deduplication, scoring, CSV and SQLite pipeline unchanged.
 
-## 2. Engineering Work Completed
+**Extraction status:** No live extraction was performed. No source has been confirmed as authorized.
 
-- Created `src/source_audit.py` for URL validation, robots.txt review, HTTP outcome recording, and source-audit logging.
-- Added a conservative decision rule: an unknown or disallowed robots status does not authorize automated extraction.
-- Added `tests/test_source_audit.py` with mocked HTTP responses to test URL validation and audit decisions.
-- Added `requests` to `requirements.txt`.
-- Reviewed and documented initial source-policy findings in `docs/source_audit.md`.
-- Preserved the existing cleaning, scoring, CSV processing, and SQLite pipeline.
+## 2. Technical Stack Utilized
 
-## 3. Testing and Verification
+Python, requests, urllib.robotparser, Pandas, SQLite3, pytest, Git/GitHub. BeautifulSoup and Playwright installed; not used for live extraction.
 
-**Latest test result:** 19 passed.
+## 3. Compliance & Scraping Throttling Audit
 
-The source-audit utility was executed in local mode. That execution confirmed the utility starts successfully but did not perform a live website review.
+| Source | robots.txt result | Terms reviewed | Decision |
+|---|---|---|---|
+| 99acres | Automated request: HTTP 403. Manual browser review: allows the city landing page; disallows `/projects/`, `/top-projects/`, `/search/property/`, `/dealersearch/`, `/project_data/`, `/registry-transactions*`. Evidence: `evidence/robots_99acres_manual_20261013.txt` | [YES/NO; quote clause in `docs/source_audit.md`] | Excluded from automated extraction |
+| MahaRERA | Automated request: HTTP 403. Browser also showed "Forbidden" for [EXACT URL]. Evidence: [screenshot filename] | [YES/NO] | Excluded pending written permission |
+| data.gov.in | [HTTP status / result, or "not yet checked"] | [YES/NO] | [decision] |
+| Overpass API | [HTTP status / result, or "not yet checked"] | [YES/NO] | [decision] |
 
-Git verification confirmed that the repository was synchronized with `origin/main` and the working tree was clean at commit `93daa50`.
+- **Robots.txt Adherence:** Checked before any content request. No disallowed path was requested, and no block was bypassed (no User-Agent spoofing, proxies or browser impersonation).
+- **Rate Limiting:** Randomized 1.5s–3.0s delay is implemented in `source_audit.py`. `robots_check.py` makes one robots.txt request per host per run. Total requests made: [N, from `reports/robots_checks.csv` and your run history].
+- **HTTP Errors:** 403 from 99acres and MahaRERA (robots.txt). [Add others.]
 
-## 4. Source Discovery and Compliance Status
+## 4. Pipeline Operational Metrics
 
-| Source | Intended purpose | Current status |
-|---|---|---|
-| MahaRERA | Registered-project and market context | Candidate source; automated access authorization pending |
-| 99acres | Property-market research | Terms and automated-access authorization pending |
-| Reddit | Public discussion research | Excluded from automated extraction pending required permission |
-
-No source has yet been verified as authorized for the intended automated collection of buyer-intent records and mobile numbers.
-
-No live scraping or real-prospect extraction is claimed in this report.
-
-## 5. Pipeline Metrics
-
-| Metric | Day 2 live-ingestion result |
+| Metric | Live result (Day 2) |
 |---|---:|
-| Live source requests performed | 0 |
-| Live raw prospect records ingested | 0 |
-| Live records rejected | 0 |
-| Live duplicates removed | 0 |
-| Live clean prospect records produced | 0 |
+| Live content requests | 0 |
+| Raw Ingestion Count | 0 |
+| Records Dropped (Invalid/Junk) | 0 |
+| Duplicate Count Removed | 0 |
+| Cumulative Clean Prospects Stored | 0 / 100 |
 
-These are live-ingestion metrics, not the results of the existing synthetic-data pipeline. The previously tested synthetic pipeline processed five sample records, rejected one invalid record, removed one duplicate, and produced three clean sample records.
+Synthetic regression test (not real prospects): 5 raw, 1 invalid, 1 duplicate, 3 clean. Automated tests: [19 passed, re-run `python -m pytest` and confirm]. `robots_check.py` is not yet covered by pytest.
 
-## 6. Blockers and Resolution Plan
+## 5. Technical Challenges & Proof of Concept (PoC) Solutions
 
-**Blocker:** An appropriate source has not yet been verified as permitting the intended automated access and use of prospect contact data.
+**Blocker:** The two main candidate sources actively block automated access, and no authorized source has been confirmed for prospect contact data. A valid mobile number is not proof of consent or permission to contact, and collection must be consistent with DPDP.
 
-**Planned actions:**
-1. Review the applicable terms and robots.txt policies for candidate sources.
-2. Identify an authorized source or obtain written permission for the intended collection.
-3. Confirm how records without an authorized mobile number should be handled.
-4. Implement a small extraction proof of concept only after the source and permitted fields are verified.
-5. Integrate authorized records into the existing cleaning, scoring, deduplication, and database pipeline.
+**PoC:** `python robots_check.py --contact [EMAIL] "https://www.99acres.com/Pune-Real-Estate.htm" "https://www.maharera.maharashtra.gov.in/"` returned HTTP 403 for both robots.txt requests. Log and CSV are in `evidence/` and `reports/`.
 
-No access controls will be bypassed, and synthetic data will not be reported as real prospects.
+**Resolution:** Excluded both sources, preserved evidence, and escalated to the technical desk with three questions: (1) which source is authorized or will one be supplied, (2) what lawful basis applies to mobile numbers, (3) whether Day 3 and Day 5 benchmarks may use clearly labelled synthetic data. Awaiting response (SLA: 10:00 AM IST next business day).
 
-## 7. Deliverables
+## 6. Attached Deliverables
 
-- `src/source_audit.py`
-- `tests/test_source_audit.py`
+- `robots_check.py`
+- `reports/robots_checks.csv`
+- `evidence/` (robots.txt copies, run log, screenshot)
+- `src/source_audit.py`, `tests/test_source_audit.py`
 - `docs/source_audit.md`
-- `requirements.txt`
+- `.gitignore`
 - `reports/day2.md`
 
-## 8. Next-Day Plan
+## 7. Next-Day Plan
 
-Continue source discovery, resolve the authorization blocker, and prepare the pipeline for a small, compliant extraction test. Record actual request counts, outcomes, and data-quality metrics once an authorized source is available.
-
-**Status:** Source-audit tooling implemented and tested; live-source authorization and extraction remain pending.
+- Apply the tech desk's reply to source selection. If an approved source is confirmed, build a minimal extraction proof of concept in `src/scraper.py` (currently empty) with robots checks and 1.5s–3.0s jitter enforced.
+- Cover `robots_check.py` with unit tests.
+- Fix `save_leads()` to report rows actually inserted.
+- Update README structure and status.

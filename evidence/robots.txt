@@ -1,0 +1,89 @@
+# Viewed manually in browser 13/10/2026
+For https://www.99acres.com/robots.txt
+
+User-agent: *
+
+Disallow: /sums/
+Disallow: /joomla/
+Disallow: /sar/
+Disallow: /mysql_pulsechck/
+Disallow: /stats/
+Disallow: /property/bms_wrapper.php
+Disallow: /property/photo_serve.php
+Disallow: /property/logo_serve.php
+Disallow: /property/np_photo_serve.php
+Disallow: /property/photo_dealer.php
+Disallow: /do/imagegallery/imageWiseTracking
+Disallow: /do/fp_summary_layer_all
+Disallow: /do/tracking/
+Disallow: /customised/includes/form.html
+Disallow: /do/tracking/trackUserAction
+Disallow: /customised/includeheader/microsite-header.html
+Disallow: /customised/includeheader/microsite-footer.html
+Disallow: /do/markbox/show
+Disallow: /do/quicksearch/getcluster_ajax
+Disallow: /do/locality_suggestor/
+Disallow: /do/quicksearch/getresults_ajax
+Disallow: /do/my99acres/
+Disallow: /do/emi_calculator/
+Disallow: /do/userlogin/ajaxSignIn
+Disallow: /do/sendemailsms/
+Disallow: /property/quick_search.php
+Disallow: /projects/
+Disallow: /cache/
+Disallow: /0003005/
+Disallow: /mailers/
+Disallow: /load/sendemailsms/showLayer/
+
+
+Disallow: /om.php
+Disallow: /j2.php
+
+Disallow: /getSellerConstants/
+Disallow: /getConditions/
+Disallow: /loadAjaxData/
+
+
+Disallow: /articles/component/content/frontpage/component/content/?start=75
+Disallow: /articles/component/content/frontpage/frontpage/component/content/?start=55
+Disallow: /articles/component/search/component/search/?searchword=watch&searchphrase=all&start=40
+
+Disallow: /do/Beacon/index/
+Disallow: /do/Company/propertyheadline_citynews?code=2
+Disallow: /do/quicksearch/
+Disallow: /do/lms/NonLoginLinksOpen/
+
+Disallow: /top-projects/
+
+Disallow: /api-aggregator/
+Disallow: /do/clickStreamTracking/
+Disallow: /react-recom-cards/
+
+Disallow: /ask/*
+
+Disallow: /search/property/
+Disallow: /dealersearch/
+Disallow: /registry-transactions*
+
+Disallow: /reint/
+Disallow: /do/rule_based_recommendations/v3
+Disallow: /onlineCampaign/get
+
+Disallow: /project_data/
+Disallow: /ext-pt/tag/
+
+User-agent: GPTBot
+Disallow: /
+User-agent: Anthropic
+Disallow: /
+User-agent: Mistral
+Disallow: /
+User-agent: Copilot
+Disallow: /
+
+Sitemap: https://www.99acres.com/sitemaps/afterhttps-main-urls.xml
+
+For https://maharera.maharashtra.gov.in/robots.txt
+
+Forbidden
+You don't have permission to access this resource.  
