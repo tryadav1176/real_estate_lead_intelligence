@@ -12,7 +12,7 @@ Identify public sources that may lawfully and technically support real-estate ma
 | Source | Intended use | robots.txt checked | Terms reviewed | Automated access authorized | Decision |
 |---|---|---|---|---|---|
 | 99acres | Property-market context; buyer-intent use unconfirmed | Pending | Pending | Pending | Do not scrape until verified |
-| Reddit | Public discussion research; individual contact collection excluded | Pending | Pending | Pending | Do not scrape without applicable permission |
+| Reddit | Public discussion research | Not required to establish policy decision | Reviewed | No - authorization not obtained | Exclude from automated extraction pending permission |
 | Official MahaRERA website | Registered-project and market context | Pending | Pending | Pending | Review official access rules first |
 
 ## Compliance rules
