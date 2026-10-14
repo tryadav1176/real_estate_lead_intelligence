@@ -2,7 +2,7 @@
 
 **Project:** Amar Realty — Lead Intelligence & Data Engineer Evaluation
 **Candidate:** Tejas Rajendra Yadav
-**Evaluation date:** 13 October 2026
+**Evaluation date:** 14 October 2026
 **Target geography:** Hadapsar, Fursungi, and adjacent East Pune
 **Milestone:** Hygiene, Regex Cleansing and Deduplication Logic
 
@@ -60,23 +60,26 @@ Public visibility and robots.txt permission alone do not establish authorization
 
 ## 5. Test and Pipeline Results
 
-**Status: Pending final execution.**
+**Status: Pipeline completed successfully; automated tests passed.**
 
-The tests and pipeline have not yet been rerun following the current set of edits.
+The pipeline was executed using the local `data/raw/sample_leads.csv` synthetic test dataset.
 
 | Metric | Result |
-|---|---|
-| Test suite | Pending |
-| Pipeline execution | Pending |
-| Raw input count | Pending |
-| Invalid records excluded | Pending |
-| Duplicate records removed | Pending |
-| Clean unique output records | Pending |
-| New database insertions | Pending |
-| Existing database records skipped | Pending |
-| Genuine authorized prospects collected | Not established |
+|---|---:|
+| Raw input records | 5 |
+| Invalid records excluded | 1 |
+| Duplicate records removed from input | 1 |
+| Clean unique records | 3 |
+| New database insertions | 0 |
+| Existing database records skipped | 3 |
+| Invalid records rejected by database layer | 0 |
+| Duplicate records within database input batch | 0 |
 
-No production collection count is claimed in this report.
+**Pipeline outcome:** The pipeline completed and exported the cleaned records to `data/processed/cleaned_leads.csv`. All three clean unique records were skipped by the database because they already existed.
+
+**Automated tests:** All tests passed in the latest reported test run. Record the exact test count and execution time from the corresponding terminal output.
+
+**Data limitation:** The pipeline used synthetic test records. No genuine prospects collected through an authorized source are established by this run. The results demonstrate local processing and database deduplication, not production lead acquisition.
 
 ## 6. Blockers and Risks
 
