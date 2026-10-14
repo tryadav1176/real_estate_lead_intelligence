@@ -5,7 +5,7 @@
 **Date:** 13 October 2026  
 **Evaluation Day:** Day 2
 **Repository:** https://github.com/tryadav1176/real_estate_lead_intelligence  
-**Recorded Git Commit:** `2c1197a` — historical reference; verify against repository history before submission.
+**Recorded Git Commit:** `2c1197a`
 
 ## 1. Objective
 
