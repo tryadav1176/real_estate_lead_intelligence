@@ -1,0 +1,9 @@
+# Fetched: 2026-10-15T11:02:46.106212+00:00
+# URL: https://overpass-api.de/robots.txt
+# HTTP status: 200
+# State: RULES
+
+User-agent: *
+Disallow: /api/
+Disallow: /munin/
+Sitemap: https://z.overpass-api.de/api/sitemap

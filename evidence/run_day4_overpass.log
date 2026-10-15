@@ -1,0 +1,8 @@
+﻿
+== https://overpass-api.de  robots.txt HTTP 200  state=RULES
+   evidence file: evidence\robots_overpass-api.de_20261015T110246Z.txt
+   NO       https://overpass-api.de/api/status
+            Sitemaps: https://z.overpass-api.de/api/sitemap
+
+Logged 1 row(s) to reports\robots_checks.csv
+Next: read the site's Terms of Service by hand and fill the terms_* and authorized_decision columns.
