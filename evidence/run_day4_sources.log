@@ -1,0 +1,34 @@
+﻿
+== https://esearchigr.maharashtra.gov.in  robots.txt HTTP 404  state=NO_RULES
+   evidence file: (no text to save)
+   note: No robots.txt published. This is NOT permission; the ToS still decides.
+   YES (no robots.txt; ToS still required) https://esearchigr.maharashtra.gov.in/
+
+== https://www.maharera.maharashtra.gov.in  robots.txt HTTP 403  state=DISALLOW_ALL
+   evidence file: (no text to save)
+   note: Access to robots.txt is restricted; treat as blocked
+   NO       https://www.maharera.maharashtra.gov.in/projects-search-result
+
+== https://opendata.pmc.gov.in  robots.txt HTTP 404  state=NO_RULES
+   evidence file: (no text to save)
+   note: No robots.txt published. This is NOT permission; the ToS still decides.
+   YES (no robots.txt; ToS still required) https://opendata.pmc.gov.in/
+
+== https://adc-ecos.enlightcloud.com  robots.txt HTTP 403  state=DISALLOW_ALL
+   evidence file: (no text to save)
+   note: Access to robots.txt is restricted; treat as blocked
+   NO       https://adc-ecos.enlightcloud.com/1133pmcwebsitev2/s3fs-public/DP-Plan/23-villages-2/DP-Report-2021-vol-1.pdf
+
+== https://www.magicbricks.com  robots.txt HTTP 403  state=DISALLOW_ALL
+   evidence file: (no text to save)
+   note: Access to robots.txt is restricted; treat as blocked
+   NO       https://www.magicbricks.com/Property-Rates-Trends/Multistorey-Apartment-rates-Fursungi-in-Pune
+
+== https://www.reddit.com  robots.txt HTTP 200  state=RULES
+   evidence file: evidence\robots_www.reddit.com_20261015T100607Z.txt
+   NO       https://www.reddit.com/r/pune/
+   NO       https://www.reddit.com/r/pune/comments/18wuc0v/which_company_is_better_for_searching_real_estate/
+   NO       https://www.reddit.com/r/PuneClassifieds/comments/1qf9tsv/buying_a_new_flat_in_pune_read_this_before_you/
+
+Logged 8 row(s) to reports\robots_checks.csv
+Next: read the site's Terms of Service by hand and fill the terms_* and authorized_decision columns.
