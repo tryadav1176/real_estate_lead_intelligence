@@ -21,7 +21,11 @@ def run_pipeline():
         )
 
     # 1. Load source records.
-    raw_df = pd.read_csv(INPUT_FILE)
+    # Update this line in src/pipeline.py
+    raw_df = pd.read_csv(
+        INPUT_FILE, 
+        dtype={"Mobile_Number": str, "Requirement": str, "Target_Zone": str}
+    )
     raw_count = len(raw_df)
 
     # 2. Normalize fields and identify invalid rows.

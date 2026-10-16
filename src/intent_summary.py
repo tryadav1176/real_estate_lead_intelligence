@@ -100,6 +100,27 @@ def summarize(df):
     }
 
 
+def classify_intent(text):
+    """Classify text into one of the 6 authorized intent categories."""
+    if not isinstance(text, str) or not text.strip():
+        return "unknown"
+        
+    text_lower = text.lower()
+    
+    if any(kw in text_lower for kw in ["sell my", "selling", "available for sale", "broker"]):
+        return "seller listing"
+    elif any(kw in text_lower for kw in ["looking to buy", "want to purchase", "immediate buyer"]):
+        return "direct purchase"
+    elif any(kw in text_lower for kw in ["future investment", "what are the rates", "price trends"]):
+        return "emerging purchase"
+    elif any(kw in text_lower for kw in ["on rent", "looking for flatmates", "tenant"]):
+        return "rental"
+    elif any(kw in text_lower for kw in ["traffic", "construction", "water supply", "development plan"]):
+        return "geographic context"
+        
+    return "unknown"
+
+
 def main():
     path = Path(sys.argv[1]) if len(sys.argv) > 1 else DEFAULT_PATH
     df = load_log(path)
