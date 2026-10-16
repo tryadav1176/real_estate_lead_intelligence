@@ -146,16 +146,15 @@ def fetch_authorized_page(
 
     content_type = response.headers.get("Content-Type", "").lower()
 
-    if "text/html" not in content_type:
-        raise ValueError(
-            "Unexpected response content type; expected HTML."
-        )
+    if not any(t in content_type for t in ("text/html", "application/xhtml+xml")):
+        raise ValueError(f"Unexpected response content type '{content_type}'; expected HTML/XHTML.")
 
     return {
         "url": response.url,
         "status_code": response.status_code,
         "content_type": content_type,
         "html": response.text,
+        "request_timestamp": time.monotonic(),  # Handy for chaining requests
     }
 
 

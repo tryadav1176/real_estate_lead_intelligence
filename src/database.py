@@ -32,7 +32,6 @@ def get_connection():
 
 
 def initialize_database():
-    """Create the leads table and safely add new optional columns."""
     with get_connection() as connection:
         connection.execute("""
             CREATE TABLE IF NOT EXISTS leads (
@@ -45,11 +44,21 @@ def initialize_database():
                 Source_Channel TEXT NOT NULL,
                 Source_Reference TEXT,
                 Intent_Evidence TEXT,
+                Intent_Type TEXT NOT NULL DEFAULT 'unknown', -- ADD THIS COLUMN
                 Verification_Status TEXT NOT NULL DEFAULT 'Not verified',
                 Deduplication_Status TEXT NOT NULL DEFAULT 'Unique'
             )
         """)
 
+        # Add Intent_Type to the migrations list
+        migrations = {
+            "Source_Reference": "TEXT",
+            "Intent_Evidence": "TEXT",
+            "Intent_Type": "TEXT NOT NULL DEFAULT 'unknown'", # ADD THIS MIGRATION
+            "Verification_Status": "TEXT NOT NULL DEFAULT 'Not verified'",
+            "Deduplication_Status": "TEXT NOT NULL DEFAULT 'Unique'",
+        }
+        
         # SQLite CREATE TABLE IF NOT EXISTS does not update an existing
         # table. Add new fields individually for existing databases.
         existing_columns = {
