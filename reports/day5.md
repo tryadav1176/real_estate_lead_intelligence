@@ -29,12 +29,12 @@
 
 ## 2. Technical Stack Utilized
 
-Python, requests, urllib.robotparser, pandas, SQLite3, pytest, Git/GitHub. (No commercial scraping APIs utilized)[cite: 3].
+Python, requests, urllib.robotparser, pandas, SQLite3, pytest, Git/GitHub. (No commercial scraping APIs utilized).
 
 ## 3. Compliance & Scraping Throttling Audit
 
 - **Targets tested (robots.txt only):** 99acres, MahaRERA, IGR e-search, PMC Open Data, PMC Development Plan PDF host, MagicBricks, Reddit, OpenStreetMap Overpass.
-- **Robots.txt Adherence:** only robots.txt files were requested. No page content was fetched from any source, and no disallowed path was requested[cite: 3].
+- **Robots.txt Adherence:** only robots.txt files were requested. No page content was fetched from any source, and no disallowed path was requested.
 - **Requests made:** 11 robots.txt requests in total (4 on 13/10, 7 on 15/10), one per host per run, with an identified User-Agent.
 - **Responses:** HTTP 403 x7 (from 4 hosts: 99acres, MahaRERA, PMC plan PDF host, MagicBricks); HTTP 404 x2 (IGR, PMC Open Data); HTTP 200 x2 (Reddit: `Disallow: /` for all bots; Overpass: `Disallow: /api/`).
 - **Rate limiting:** the 1.5s-3.0s jitter is implemented in the guarded scraper, but no content requests were made, so it was not exercised against any source[cite: 2, 3].
@@ -53,13 +53,13 @@ Python, requests, urllib.robotparser, pandas, SQLite3, pytest, Git/GitHub. (No c
 | Raw Ingestion Count / Records Dropped / Duplicates Removed | 0 / 0 / 0 |
 | Cumulative Clean Prospects Stored | 0 / 100 |
 
-No synthetic data was processed or committed as a Day 5 result[cite: 3]. Mobile-number format validation does not establish ownership, consent or eligibility for contact[cite: 3].
+No synthetic data was processed or committed as a Day 5 result. Mobile-number format validation does not establish ownership, consent or eligibility for contact.
 
 ## 5. Technical Challenges & Proof of Concept (PoC) Solutions
 
-**Blocker:** No source has been authorized for genuine, permitted property-intent collection[cite: 3]. Sources that expose individuals' posts (Reddit, YouTube) restrict lead harvesting[cite: 3]; listing and registry portals returned HTTP 403 or are supply-side data[cite: 3].
+**Blocker:** No source has been authorized for genuine, permitted property-intent collection. Sources that expose individuals' posts (Reddit, YouTube) restrict lead harvesting; listing and registry portals returned HTTP 403 or are supply-side data.
 
-**Resolution so far:** Documented each source with its evidence, bypassed no restrictions[cite: 3], evaluated alternatives, and asked the desk which route it accepts[cite: 3]. Upgraded pipeline with modular adapters and explicit classification logic to ingest data immediately upon approval.
+**Resolution so far:** Documented each source with its evidence, bypassed no restrictions, evaluated alternatives, and asked the desk which route it accepts. Upgraded pipeline with modular adapters and explicit classification logic to ingest data immediately upon approval.
 
 **Incomplete or untested components:**
 - Free-text normalization is only tested on exact aliases (for example, edge cases like "Hadapsar, Pune" or "2-BHK" are not tested).
@@ -71,4 +71,4 @@ No synthetic data was processed or committed as a Day 5 result[cite: 3]. Mobile-
 
 ## 6. Attached Deliverables
 
-`src/adapter.py`, `src/scorer.py`, `src/pipeline.py`, `reports/robots_checks.csv`, `docs/source_discovery.md`, `evidence/` (robots.txt copies, run logs, `pytest_day5.log`), `reports/day5.md`[cite: 3]
+`src/adapter.py`, `src/scorer.py`, `src/pipeline.py`, `reports/robots_checks.csv`, `docs/source_discovery.md`, `evidence/` (robots.txt copies, run logs, `pytest_day5.log`), `reports/day5.md`
