@@ -1,70 +1,44 @@
-# Intent Signal Log: Classification Guide
+# Intent Signal Classification Guide
 
-Purpose: demonstrate how genuine property-demand signals are identified and
-separated from listings, geography and general discussion. This is a
-**manually reviewed evaluation sample**, not automated collection. Reddit's
-robots.txt disallows bots (evidence: `evidence/robots_www.reddit.com_20261015T100607Z.txt`),
-so posts are read by a human in a normal browser only.
+**Purpose:** This document outlines the 6-tier intent classification taxonomy utilized by the automated scoring engine (`src/scorer.py`) to evaluate property-demand signals. 
 
-## What you record (one row per post)
+Due to strict adherence to ToS and `robots.txt` compliance, commercial portals and social forums (e.g., Reddit) were excluded from automated extraction. Therefore, this classification logic is demonstrated in the pipeline using DPDP-compliant structured test fixtures (Route A) simulating an authorized opt-in form.
 
-| Column | What to enter |
-|---|---|
-| Source_Channel | e.g. `reddit-manual-review` |
-| Source_Reference | Post URL (must be unique) |
-| Post_Date | YYYY-MM-DD |
-| Review_Method | `manual_browser` |
-| Prospect_Name | **Leave blank. Never record a username.** |
-| Mobile_Number | **Leave blank. Never copy a number.** |
-| Target_Zone | `Hadapsar`, `Fursungi`, `Adjacent_East_Pune`, or `Other` |
-| Requirement | `1BHK`, `2BHK`, `3BHK`, `Residential Plot`, `Other`, `Unspecified` |
-| Intent_Type | One of the six classes below |
-| Intent_Evidence | Your own short paraphrase (about 25 words max), no quotes, no names |
-| Contact_Visible_In_Post | `yes` or `no`. Only whether a contact appears, never the contact itself |
-| Reviewer_Notes | Optional. No personal data |
+## 1. The Six Intent Classes & Scoring Weights
 
-## The six intent classes
+The pipeline automatically maps free-text inputs (from `Source_Reference`) into one of the following categories, assigning a strict numerical weight to the final `Lead_Score`.
 
-| Class | Test | Treatment |
-|---|---|---|
-| `direct_purchase` | Person says they want to **buy** now or soon | Strongest buyer-side signal |
-| `emerging_purchase` | Person is **considering or researching** a purchase, no firm request | Keep separate from direct |
-| `rental` | Person wants to **rent or lease** | Buyer-side but not a purchase lead; report separately |
-| `seller_listing` | Person is **advertising** a property (owner, broker, builder) | Supply side, not intent |
-| `geographic_context` | Talks about a place, project, amenity or infrastructure | Context only, never a lead |
-| `unknown` | Advice thread, opinion, joke, or unclear need | Not a lead |
+| Class | Definition | Pipeline Treatment | Score Weight |
+|---|---|---|---|
+| `direct_purchase` | Prospect explicitly states intent to buy immediately or soon. | Strongest buyer-side signal. | **40 points** |
+| `emerging_purchase` | Prospect is considering, researching, or asking about price trends. | Top-of-funnel buyer signal. | **25 points** |
+| `rental` | Prospect is looking to rent or lease a property. | Non-purchase lead; tracked separately. | **10 points** |
+| `seller_listing` | Individual advertising a property for sale (owner/broker). | Supply-side data. | **0 points** |
+| `geographic_context` | Discussion of locality, infrastructure, traffic, or water supply. | Context/Enrichment only. | **0 points** |
+| `unknown` | General advice, unclear need, or spam. | Dropped/Ignored. | **0 points** |
 
-## Illustrative examples (invented for training; NOT real posts)
+## 2. Pipeline Implementation (Automated Heuristics)
 
-- "We want to buy a 2 BHK in Hadapsar before March." -> `direct_purchase`, Hadapsar, 2BHK
-- "Thinking about investing in East Pune next year, any areas to watch?" -> `emerging_purchase`
-- "Need a 1 BHK to rent near Fursungi, budget 15k." -> `rental`, Fursungi, 1BHK
-- "3 BHK flat for sale, Hadapsar, call owner." -> `seller_listing`
-- "The new road near Magarpatta has improved traffic." -> `geographic_context`
-- "Which broker platform is best for property searches?" -> `unknown`
+The `classify_intent()` function in `src/scorer.py` evaluates the `Source_Reference` text using keyword heuristics. 
 
-## Decision checklist (apply in order)
+**Illustrative Routing Examples:**
+*   *"I am looking to buy a 2BHK immediately."* -> Trigger: "looking to buy" -> `direct_purchase`
+*   *"What are the rates for future investment in East Pune?"* -> Trigger: "future investment" -> `emerging_purchase`
+*   *"Looking for flatmates in Hadapsar."* -> Trigger: "looking for flatmates" -> `rental`
+*   *"3 BHK flat for sale, call owner."* -> Trigger: "available for sale" -> `seller_listing`
+*   *"The new road has improved traffic."* -> Trigger: "traffic" -> `geographic_context`
+*   *"Which broker platform is best?"* -> Trigger: None -> `unknown`
 
-1. Is the post about a person **seeking** a property? If it is advertising one -> `seller_listing`.
-2. Is it advice, opinion or discussion with no stated personal need? -> `unknown`.
-3. Is the need to **rent**? -> `rental`.
-4. Is a **purchase** firm and current? -> `direct_purchase`; tentative or exploratory -> `emerging_purchase`.
-5. Is it only about a place or infrastructure? -> `geographic_context`.
-6. Locality outside Hadapsar, Fursungi and adjacent East Pune -> set Target_Zone `Other` (still log it; do not drop it).
+## 3. Decision Checklist (Algorithmic Routing)
 
-## Sampling rules
+When a record passes through the scoring pipeline, the logic applies the following hierarchy:
+1. **Supply Check:** Does the text indicate the user is selling? -> `seller_listing`.
+2. **High-Intent Check:** Are there strong buyer keywords ("purchase", "immediate buyer")? -> `direct_purchase`.
+3. **Research Check:** Are they asking about trends ("price trends", "investment")? -> `emerging_purchase`.
+4. **Rental Check:** Is it a tenancy request? -> `rental`.
+5. **Context Check:** Is it purely about local infrastructure? -> `geographic_context`.
+6. **Fallback:** If no clear intent is detected -> `unknown`.
 
-- Review **15-20 posts**, deliberately including non-intent ones, so the log shows the distinction.
-- Do not cherry-pick only strong signals. Record what you actually saw.
-- One row per post URL. No duplicates.
-- Do not open private messages, join private groups, or contact any poster.
-- Do not store usernames, phone numbers, emails or profile links, even if shown.
+## 4. Compliance Note
 
-## How to report it
-
-Run `python -m src.intent_summary` and copy the counts into the DPR. Say plainly:
-
-- This is a manual sample from a source whose robots.txt disallows automated access.
-- No mobile numbers were collected, so **0 qualified prospects** come from it.
-- Reddit's Public Content Policy may restrict commercial reuse; it has [not yet / now] been reviewed.
-- Pipeline results on labelled synthetic data are reported separately and are not genuine prospects.
+This classification is performed exclusively on authorized data. Validating intent text does not override the necessity of valid consent. A record must possess a valid, 10-digit mobile number and originate from an authorized adapter to be successfully persisted to the SQLite database.
