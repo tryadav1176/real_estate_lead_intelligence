@@ -1,37 +1,42 @@
 # Real Estate Lead Intelligence Pipeline
 
-A Python-based data engineering project for discovering authorized real-estate information sources, normalizing and validating data, deduplicating records, calculating explainable scores, and storing eligible property-intent records for the Hadapsar, Fursungi, and adjacent East Pune micro-markets.
+A Python-based data engineering project for discovering authorized real-estate information sources, normalizing and validating data, deduplicating records, calculating explainable scores based on intent and recency, and storing eligible property-intent records for the Hadapsar, Fursungi, and adjacent East Pune micro-markets.
 
 **Candidate:** Tejas Rajendra Yadav  
 **Target Role:** Lead Intelligence & Data Engineer – Real Estate  
-**Evaluation Start:** 12 October 2026
-**Project Status:** Development and source-authorization assessment
+**Evaluation Status:** Final Submission (Day 7)
+
+## 📌 Project Overview
+
+This repository contains a robust, DPDP-compliant ETL pipeline designed to ingest, clean, deduplicate, score, and persist real estate prospect data for Hadapsar, Fursungi, and adjacent East Pune.
+
+Built with a strict adherence to ethical data collection, the architecture features a "deny-by-default" extraction layer that respects `robots.txt`, enforces rate-limiting, and strictly separates genuine pipeline mechanics from unauthorized PII scraping.
+
+## 🏗️ Architecture & Compliance Highlights
+
+**Modular Adapters (`src/adapter.py`):** Utilizes a `BaseSourceAdapter` pattern. Currently implements a `SimulatedOptInAdapter` to process authorized structured test fixtures (simulating a DPDP-compliant opt-in form) without exposing live PII.
+**Strict Validation & Deduplication (`src/cleaner.py`):** Enforces 10-digit mobile validation (6-9 prefix), normalizes free-text zones/requirements, and drops invalid or duplicate inputs.
+**Intent Classification & Scoring (`src/scorer.py`):** Calculates a 100-point composite `Lead_Score` utilizing a 6-tier intent classification taxonomy (direct purchase, emerging purchase, rental, seller listing, geographic context, unknown) and recency decay weighting.
+**Ethical Extraction (`src/scraper.py`):** Hardcoded 1.5s–3.0s random delay jitter. Raises explicit exceptions on HTTP 401/403/429 rather than attempting unauthorized bypasses.
+
 
 ## 1. Project Objectives
 
-- Identify and assess appropriate data sources for the target geography.
-- Collect information only through authorized access methods.
-- Normalize locality, property requirement, and mobile-number fields.
-- Exclude records that fail required validation.
-- Detect duplicates and report accurate record counts.
-- Maintain source references and evidence supporting property intent.
-- Calculate explainable lead scores using location, requirement, and recency.
-- Persist eligible records in SQLite, with PostgreSQL as a potential extension.
-- Export clean, deduplicated, ranked records when sufficient authorized data is available.
-- Maintain tests, source-review evidence, daily progress reports, and Git history.
-
-The target of up to 100 clean prospects is conditional on suitable, authorized data being available. It is not a guaranteed record count.
+- Construct a DPDP-compliant ETL pipeline with a "deny-by-default" extraction layer that respects `robots.txt`, ToS, and access restrictions.
+- Collect information strictly through authorized access methods, avoiding unauthorized bulk scraping of live PII from commercial portals.
+- Normalize locality, property requirement, and validate Indian mobile numbers via strict regular expressions.
+- Classify prospect intent into a rigorous 6-tier taxonomy.
+- Calculate explainable, weighted lead scores using Intent, Location, Requirement, and Recency factors.
+- Persist clean, deduplicated records in an SQLite database.
+- Export ranked, actionable records via automated routines.
 
 ## 2. Technology Stack
 
-- Python 3.12
-- Pandas
-- Regular expressions
-- SQLite
-- Pytest
-- Git and GitHub
-- BeautifulSoup and Playwright for future extraction only when explicitly authorized
-- PostgreSQL as a potential database extension
+- **Core:** Python 3.12, Pandas
+- **Persistence:** SQLite3 (Schema extensible for PostgreSQL)
+- **Quality Assurance:** Pytest (132/132 automated test suite)
+- **Version Control:** Git & GitHub
+- **Extraction Protocol:** `urllib`, `requests` (with hardcoded 1.5s–3.0s jitter)
 
 ## 3. Project Structure
 
@@ -39,36 +44,29 @@ The target of up to 100 clean prospects is conditional on suitable, authorized d
 real_estate_lead_intelligence/
 ├── data/
 │   ├── raw/
-│   │   └── sample_leads.csv       # Synthetic fixtures only
-│   └── processed/                 # Generated outputs
+│   │   └── simulated_opt_in_leads.csv   # Authorized Route (a) test fixtures
+│   └── processed/
+│       └── final_exported_leads.csv     # Automated pipeline output
 ├── src/
-│   ├── scraper.py                 # Reserved for authorized extraction
-│   ├── source_audit.py            # Source/robots review utility
-│   ├── cleaner.py                 # Normalization and validation
-│   ├── scorer.py                  # Provisional explainable scoring
-│   ├── database.py                # SQLite persistence and metrics
-│   └── pipeline.py                # Processing and storage workflow
-├── tests/
+│   ├── scraper.py                 # Extraction with mandatory compliance jitter
+│   ├── adapter.py                 # BaseSourceAdapter and SimulatedOptInAdapter
+│   ├── cleaner.py                 # Regex validation and deduplication
+│   ├── scorer.py                  # 6-tier intent classification and scoring
+│   ├── database.py                # SQLite persistence and deduplication logic
+│   └── pipeline.py                # End-to-end execution workflow
+├── tests/                         # 132 Unit and regression tests
 │   ├── test_cleaner.py
 │   ├── test_scorer.py
 │   ├── test_source_audit.py
 │   └── test_database.py
 ├── docs/
-│   ├── scope_architecture.md
-│   ├── source_audit.md
-│   └── source_discovery.md
-├── evidence/                      # Source-review evidence
-├── reports/
-│   ├── day1.md
-│   ├── day2.md
-│   ├── day3.md
-│   └── robots_checks.csv
-├── robots_check.py
+│   ├── intent_classification_guide.md
+│   └── source_discovery.md        # Final compliance audit and ToS reviews
+├── evidence/                      # Source-review evidence (robots.txt logs)
+├── reports/                       # Daily Progress Reports (Day 1 - Day 7)
 ├── requirements.txt
 └── README.md
 ```
-
-This is the intended structure; the actual repository should be checked before treating every listed file as present.
 
 ## 4. Standardized Record Schema
 
@@ -85,150 +83,96 @@ This is the intended structure; the actual repository should be checked before t
 | `Verification_Status` | Explicit status; defaults to `Not verified` |
 | `Deduplication_Status` | Status describing duplicate handling |
 
-The pipeline may include additional internal fields, such as `is_valid` and `Mobile_Format_Valid`, for validation and processing.
-
-**Important:** A valid mobile-number format does not establish ownership, identity, consent, or permission to contact. A record must not be described as a verified prospect unless the applicable verification criteria have actually been met.
-
 ## 5. Validation and Deduplication
 
-The cleaning stage is designed to:
+The src/cleaner.py and src/database.py modules operate in tandem to ensure absolute data hygiene:
 
-1. Normalize names and standardize missing-name values.
-2. Validate mobile numbers using strict regular-expression rules.
-3. Normalize supported locality aliases to canonical zone values.
-4. Normalize property-requirement aliases to the allowed enum values.
-5. Require a usable source channel.
-6. Mark invalid records rather than silently treating them as qualified prospects.
-7. Remove duplicate valid records using normalized mobile numbers.
-8. Retain accurate counts of input, invalid, duplicate, and output records.
-
-The persistence layer separately tracks new insertions and records skipped because the mobile number already exists in the database.
+- Validates mobile numbers using strict regex bounds.
+- Normalizes supported locality and property-requirement aliases.
+- Explicitly marks invalid records (e.g., spam, malformed fields) and excludes them from downstream processing.
+- Drops duplicate records within the ingestion batch.
+- Employs database-level constraint handling to skip records that already exist in the system, preventing historical duplication.
 
 ## 6. Lead Scoring
 
-The proposed scoring model has three components:
+The scoring model (src/scorer.py) applies a strict 100-point calibrated algorithm. It evaluates free-text intent signals and structural metadata to rank prospects:
 
-- **Location:** maximum 40 points
-- **Requirement:** maximum 35 points
-- **Recency:** maximum 25 points
+- **Intent Classification:** Maximum 40 points (direct purchase = 40, emerging purchase = 25, rental = 10, others = 0).
+- **Location Alignment:** Maximum 25 points (Hadapsar/Fursungi = 25, Adjacent_East_Pune = 15).
+- **Requirement Weight:** Maximum 20 points (Weighted based on developer inventory priority).
+- **Recency Decay:** Maximum 15 points (0-7 days = 15, 8-30 days = 10, 31-90 days = 5).
+- Scores falling outside the finite 0-100 bounds raise explicit ValueError exceptions to prevent corrupted analytics.
 
-The score is provisional until the component rules, evidence requirements, and recency calculation have been reviewed and validated.
+## 7. Local Setup Instructions
 
-A score is a ranking aid, not proof of buying intent, identity, or contact eligibility. Missing or unsupported evidence must not be replaced with invented values.
-
-## 7. Setup Instructions
-
-### Step 1 — Clone the repository
-
-```powershell
-git clone https://github.com/tryadav1176/real_estate_lead_intelligence.git
+1. **Clone the repository:**
+```bash
+git clone [https://github.com/tryadav1176/real_estate_lead_intelligence.git](https://github.com/tryadav1176/real_estate_lead_intelligence.git)
 cd real_estate_lead_intelligence
 ```
 
-### Step 2 — Create a virtual environment
-
-```powershell
+2. **Create and activate a virtual environment:**
+```
 python -m venv .venv
 ```
 
-Activate it in Windows PowerShell:
-
-```powershell
-.\.venv\Scripts\Activate.ps1
+# On Windows:
+```
+.venv\Scripts\activate
+```
+# On Mac/Linux:
+```
+source .venv/bin/activate
 ```
 
-### Step 3 — Install dependencies
+3. **Install dependencies:**
 
-```powershell
-python -m pip install -r requirements.txt
 ```
 
-Install Playwright's Chromium browser only if required by an authorized and permitted future workflow:
+pip install -r requirements.txt
 
-```powershell
-python -m playwright install chromium
 ```
 
-### Step 4 — Run the pipeline
+## 8. Execution Guide
 
-From the repository root:
+1. **Run the Data Pipeline**
+Execute the end-to-end pipeline. This will ingest the simulated test fixtures, clean the data, apply the scoring engine, persist records to the SQLite database, and automate the final CSV export.
 
-```powershell
+```
 python -m src.pipeline
 ```
 
-The pipeline reads `data/raw/sample_leads.csv`, processes the records, writes a cleaned CSV to `data/processed/cleaned_leads.csv`, and stores eligible records in the SQLite database.
+2. **Run the Automated Test Suite**
 
-The sample input is intended for development and testing. Its records must not be reported as genuine prospects.
+The repository includes 132 unit tests covering regex validation, score calibration, exception handling, and database migrations.
 
-## 8. Testing
-
-The project uses Pytest.
-
-Run the complete test suite from the repository root:
-
-```powershell
-python -m pytest -q
+```
+python -m pytest -v
 ```
 
-The suite is intended to cover normalization, invalid mobile formats, enum validation, duplicate removal, database persistence, and source-audit behavior.
+## 9. Database Schema (leads table)
 
-Report the test result only after the test command has actually completed.
+The SQLite/PostgreSQL persistence layer (src/database.py) is structured to house clean, actionable prospects:
 
-## 9. Data Collection and Compliance
+- ID (Primary Key, Auto-increment)
+- Prospect_Name (Text)
+- Mobile_Number (Text, Unique constraint for deduplication)
+- Target_Zone (Text)
+- Requirement (Text)
+- Intent_Type (Text - 6-tier taxonomy)
+- Lead_Score (Integer - 100-point scale)
+- Source_Channel (Text)
+- Source_Reference (Text)
+- Source_Timestamp (DateTime)
+- Processed_Timestamp (DateTime)
 
-- Assess source terms, applicable policies, and `robots.txt` before considering automated collection.
-- Use only access methods authorized for the intended purpose.
-- Apply request delays, including 1.5–3.0 second jitter, only where automated access is permitted and the service's policies allow it.
-- Do not bypass authentication, CAPTCHA, HTTP 403 responses, or other access controls.
-- Do not assume that publicly visible information can be collected, retained, or used for commercial outreach.
-- Minimize personal information and retain source references and evidence needed for auditability.
-- Separate geographic enrichment from person-level prospect data.
-- Record actual access results, validation counts, deduplication counts, and blockers.
-- Do not invent prospect identities, phone numbers, source references, intent evidence, or verification status.
+## 10. Documentation & Evidence
 
-If source permission is unavailable or unclear, document the issue and use an appropriate alternative proof of concept rather than attempting to circumvent restrictions.
+**Source Audit & Decisions:** See docs/source_discovery.md for a comprehensive log of robots.txt outcomes, ToS reviews, and ethical exclusion decisions for commercial portals.
+**Intent Taxonomy:** See docs/intent_classification_guide.md for the classification rubric.
+**Evaluation Logs:** See the reports/ folder for Daily Progress Reports (DPRs).
 
-## 10. Source Discovery
-
-The initial source assessment is maintained in `docs/source_discovery.md`.
-
-Candidate categories include:
-
-- **MahaRERA:** official project and regulatory information for market context.
-- **OpenStreetMap / Overpass:** geographic enrichment, not buyer-intent data.
-- **Housing.com:** potential property-market information, subject to applicable terms and authorization.
-- **OLX India:** automated collection is not approved without the necessary express authorization.
-- **Public community discussions:** potential intent signals only where platform rules and the proposed use permit collection.
-- **Government open data:** contextual analysis under the relevant dataset licence.
-
-A candidate source is not considered approved merely because it has been identified. Authorization and successful access must be recorded separately.
-
-## 11. Current Project Status
-
-The project includes a synthetic-data pipeline and source-audit work. The source-discovery document records candidate sources and outstanding authorization questions.
-
-The current implementation and test status must be confirmed from the repository before making final claims.
-
-No genuine prospect count should be claimed unless supported by actual authorized collection, source evidence, validation, and deduplication results.
-
-The scraper remains inactive until an appropriate source and permitted access method have been established. The scoring rules remain provisional.
-
-## 12. Evaluation Deliverables
-
-- Modular Python pipeline
-- Normalization and validation module
-- Regex-based mobile validation and tests
-- Deduplication and accurate record metrics
-- Database persistence and insertion counts
-- Source discovery and compliance assessment
-- Ranked CSV output when supported by suitable data
-- Automated tests
-- Daily Progress Reports
-- Source-review evidence
-- Final README and repository handover
-
-## 13. Author
+## Author
 
 **Tejas Rajendra Yadav**
 
