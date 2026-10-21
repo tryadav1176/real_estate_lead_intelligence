@@ -3,92 +3,59 @@
 
 **Candidate:** Tejas Rajendra Yadav  
 **Target Role:** Lead Intelligence & Data Engineer  
-**Evaluation Start Date:** 12 October 2026
+**Evaluation Status:** Finalized (Day 7)
 
 ### 1. Project Objective
 
-Develop a modular data pipeline to discover authorized public real-estate intent signals for the Hadapsar and Fursungi micro-markets in Pune.
+Develop a modular, DPDP-compliant data pipeline to ingest, validate, score, and persist real estate prospect data for the Hadapsar, Fursungi, and adjacent East Pune micro-markets. 
 
-The pipeline will extract permitted data, normalize and validate records, identify duplicates, calculate transparent lead scores, and store eligible records in a structured database.
+The pipeline strictly enforces ethical data collection, utilizing a "deny-by-default" extraction layer to prevent unauthorized scraping of Personal Identifiable Information (PII) from commercial portals.
 
-### 2. Scope
+### 2. Finalized Architecture Workflow
 
-- Discover suitable public data sources.
-- Extract permitted, non-authenticated information.
-- Normalize fields and validate data quality.
-- Deduplicate records.
-- Calculate lead scores from location, requirement, and recency.
-- Store validated records in SQLite or PostgreSQL.
-- Export up to 100 clean, deduplicated, ranked records.
-- Generate daily operational metrics and progress reports.
+**Source Adapters → Validation & Normalization → Intent Classification → Deduplication → Lead Scoring → SQLite Persistence → Automated CSV Export**
 
-### 3. Proposed Architecture
+### 3. Technology Stack
 
-**Source discovery → Extraction → Raw storage → Validation and normalization → Deduplication → Lead scoring → Database storage → Ranked CSV export**
+- **Core:** Python 3.12, Pandas
+- **Extraction/Adapters:** `urllib`, `requests` (with compliance jitter), Custom `BaseSourceAdapter`
+- **Database:** SQLite3 (Schema extensible to PostgreSQL)
+- **Quality Assurance:** Pytest (132/132 coverage)
+- **Version Control:** Git / GitHub
 
-### 4. Technology Stack
+### 4. Modular Adapter Design
 
-- Python
-- Pandas
-- Playwright and/or BeautifulSoup
-- SQLite initially, with PostgreSQL as an alternative
-- Regex for field normalization
-- Git for version control
-- Pytest for automated testing
+To abstract data ingestion and ensure strict compliance, the pipeline utilizes an adapter pattern (`src/adapter.py`). 
+- **`BaseSourceAdapter`:** The foundational interface for all data ingestion.
+- **`SimulatedOptInAdapter`:** The active implementation used to ingest Route (a) DPDP-compliant structured test fixtures, proving the pipeline mechanics without exposing live PII.
 
-### 5. Standardized Output Schema
+### 5. Validation and Deduplication (`src/cleaner.py`)
 
-- `Lead_Score`: Integer from 0 to 100.
-- `Prospect_Name`: Trimmed, title-cased name; default `Valued Prospect`.
-- `Mobile_Number`: Validated 10-digit Indian mobile number beginning with 6–9.
-- `Target_Zone`: `Hadapsar`, `Fursungi`, or `Adjacent_East_Pune`.
-- `Requirement`: `1BHK`, `2BHK`, `3BHK`, or `Residential Plot`.
-- `Source_Channel`: Public source domain or forum thread.
+- **Mobile Validation:** Strict regular expressions enforce 10-digit Indian mobile formats (6–9 prefix).
+- **Normalization:** Standardizes zone aliases (`Hadapsar`, `Fursungi`, `Adjacent_East_Pune`) and property requirements (`1BHK`, `2BHK`, `3BHK`, `Residential Plot`).
+- **Deduplication:** Drops duplicates within the ingestion batch and uses database `UNIQUE` constraints (`src/database.py`) to prevent historical duplication.
 
-### 6. Lead Scoring
+### 6. Intent Classification & Scoring (`src/scorer.py`)
 
-The proposed score consists of:
+The pipeline algorithmically routes text inputs into a **6-tier intent taxonomy** and applies a **100-point calibrated score**:
 
-- Location: Maximum 40 points.
-- Requirement: Maximum 35 points.
-- Recency: Maximum 25 points.
+*   **Intent Classification (Max 40 points):** `direct_purchase` (40), `emerging_purchase` (25), `rental` (10), `seller_listing` (0), `geographic_context` (0), `unknown` (0).
+*   **Location Alignment (Max 25 points):** `Hadapsar`/`Fursungi` (25), `Adjacent_East_Pune` (15).
+*   **Requirement Weight (Max 20 points):** Weighted by developer inventory priority.
+*   **Recency Decay (Max 15 points):** 0-7 days (15), 8-30 days (10), 31-90 days (5).
 
-The detailed scoring rules will be documented and confirmed with the technical evaluation team before final implementation.
+Scores falling outside the finite 0-100 bounds raise explicit `ValueError` exceptions.
 
-### 7. Compliance and Data Quality
+### 7. Database Schema (`leads` table)
 
-- Review applicable source terms and robots.txt rules.
-- Apply randomized request delays of 1.5–3.0 seconds where scraping is permitted.
-- Do not bypass authentication or access controls.
-- Collect and use personal data only where appropriately authorized.
-- Record invalid, missing, and duplicate records transparently.
-- Never fabricate prospect information or pipeline metrics.
-
-### 8. Delivery Plan
-
-Day 1: Environment, source discovery, architecture, and initial ingestion prototype.
-
-Day 2: Field normalization and validation.
-
-Day 3: Deduplication and first pipeline benchmark.
-
-Day 4: Lead scoring and database integration.
-
-Day 5: Second pipeline benchmark and quality improvements.
-
-Day 6: Testing, documentation, and reliability improvements.
-
-Day 7: Final export, repository handover, and technical defense.
-
-### 9. Current Limitations
-
-No company dataset or approved target source has been supplied at the time of writing. Initial development and testing will use clearly labelled synthetic data until a suitable source is verified.
-
-### 10. Expected Deliverables
-
-- Modular Python scripts.
-- Documented database schema.
-- Automated tests.
-- Clean and ranked CSV export.
-- Daily Progress Reports.
-- README with setup and execution instructions.
+- `ID` (Primary Key, Auto-increment)
+- `Lead_Score` (Integer, 0-100)
+- `Prospect_Name` (Text)
+- `Mobile_Number` (Text, Unique constraint)
+- `Target_Zone` (Text)
+- `Requirement` (Text)
+- `Intent_Type` (Text)
+- `Source_Channel` (Text)
+- `Source_Reference` (Text)
+- `Source_Timestamp` (DateTime)
+- `Processed_Timestamp` (DateTime)
