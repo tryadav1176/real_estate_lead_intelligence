@@ -6,4 +6,4 @@ __pycache__/
 *.db
 data/processed/*.csv
 data/raw/*
-!data/raw/sample_leads.csv
+!data/raw/simulated_opt_in_leads.csv
