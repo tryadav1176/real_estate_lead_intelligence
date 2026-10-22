@@ -128,9 +128,7 @@ source .venv/bin/activate
 3. **Install dependencies:**
 
 ```
-
 pip install -r requirements.txt
-
 ```
 
 ## 8. Execution Guide
@@ -175,6 +173,8 @@ The SQLite/PostgreSQL persistence layer (src/database.py) is structured to house
 ## Author
 
 **Tejas Rajendra Yadav**
+
+Email: tryadav0812@gmail.com
 
 GitHub: https://github.com/tryadav1176
 
