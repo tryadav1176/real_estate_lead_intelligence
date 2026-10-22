@@ -1,0 +1,5 @@
+Prospect_Name,Mobile_Number,Target_Zone,Requirement,Source_Channel,Source_Reference,Source_Timestamp
+Test Buyer One,9876543210,Hadapsar,2BHK,Opt-In Form,I am looking to buy a 2BHK immediately.,2026-10-18T10:00:00Z
+Test Buyer Two,+91 9999988888,Fursungi,1BHK,Opt-In Form,What are the rates for future investment?,2026-09-01T10:00:00Z
+Test Duplicate,9876543210,Hadapsar,2BHK,Opt-In Form,I am looking to buy a 2BHK immediately.,2026-10-18T10:00:00Z
+Test Invalid,12345,Unknown,4BHK,Opt-In Form,Spam entry,2026-10-19T10:00:00Z
