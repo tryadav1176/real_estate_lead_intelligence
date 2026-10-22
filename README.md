@@ -177,4 +177,5 @@ The SQLite/PostgreSQL persistence layer (src/database.py) is structured to house
 **Tejas Rajendra Yadav**
 
 GitHub: https://github.com/tryadav1176
+
 Repository: https://github.com/tryadav1176/real_estate_lead_intelligence
